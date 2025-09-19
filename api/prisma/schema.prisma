@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String        @id @default(uuid())
+  email         String        @unique
+  username      String        @unique
+  first_name    String?
+  last_name     String?
+  city          String?
+  age           Int?
+  role          Role          @default(USER)
+  password      String
+  loginMethodId Int
+  comment_likes CommentLike[]
+  comments      Comment[]
+  post_likes    PostLike[]
+  posts         Post[]
+  products       Product[]
+  wishlist      Wishlist[]
+  cart          Cart[]
+  loginMethod   loginmethod  @relation(fields: [loginMethodId], references: [id])
+
+  @@index([loginMethodId], map: "users_loginMethodId_fkey")
+  @@map("users")
+}
+
+model Post {
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  title     String
+  published Boolean    @default(false)
+  authorId  String
+  content   String
+  comments  Comment[]
+  likes     PostLike[]
+  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId], map: "posts_authorId_fkey")
+  @@map("posts")
+}
+
+model PostLike {
+  id      Int      @id @default(autoincrement())
+  addedAt DateTime @default(now())
+  postId  Int
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "post_likes_ibfk_1")
+  post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId], map: "unique_post_like")
+  @@index([postId], map: "post_likes_postId_fkey")
+  @@index([userId], map: "post_likes_userId_fkey")
+  @@map("post_likes")
+}
+
+model CommentLike {
+  id        Int      @id @default(autoincrement())
+  addedAt   DateTime @default(now())
+  commentId Int
+  userId    String
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, commentId], map: "comment_likes_userId_commentId_key")
+  @@index([commentId], map: "comment_likes_commentId_fkey")
+  @@map("comment_likes")
+}
+
+model Comment {
+  id        Int           @id @default(autoincrement())
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  content   String
+  authorId  String
+  postId    Int
+  likes     CommentLike[]
+  author    User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([authorId], map: "comments_authorId_fkey")
+  @@index([postId], map: "comments_postId_fkey")
+  @@map("comments")
+}
+
+model loginmethod {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  user        User[]
+}
+
+model Product {
+  id               String            @id @default(uuid())
+  name             String
+  description      String
+  price            Decimal
+  quantity         Int
+  status           ProductStatus
+  ownerId          String
+  owner            User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  WishlistProducts WishlistProduct[]
+  CartProduct      CartProduct[]
+}
+
+model Wishlist {
+  id               Int               @id @default(autoincrement())
+  userId           String
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wishlistProducts WishlistProduct[]
+}
+
+model WishlistProduct {
+  id         Int      @id @default(autoincrement())
+  productId  String
+  wishlistId Int
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id          Int           @id @default(autoincrement())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  CartProduct CartProduct[]
+}
+
+model CartProduct {
+  id        Int     @id @default(autoincrement())
+  productId String
+  cartId    Int
+  quantity  Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+}
+
+enum ProductStatus {
+  New
+  Broken
+  Used
+}
+
+enum Role {
+  USER
+  ADMIN
+  MOD
+}

@@ -1,0 +1,22 @@
+#env
+*.txt
+*.zip
+
+# node
+node_modules
+dist/
+
+# secrets
+.env
+certificates/
+
+# prisma
+prisma/migrations
+prisma/migrations_lock.toml
+
+# tests
+__test__/
+*.http
+
+# logs
+logs/
