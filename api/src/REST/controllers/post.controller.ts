@@ -1,13 +1,14 @@
 import { Request, NextFunction, Response } from "express";
-import { PostService } from "../services/post.services";
 import { HttpError } from "../helpers/HttpError";
 import { isUserToken } from "../../utils/others/typeGuards";
+import { container } from "../../utils/infrastructure/DIContainer";
+import { IPostService } from "../services/interfaces";
 
 export class PostController {
-  private postServices: PostService;
+  private postServices: IPostService;
 
   constructor() {
-    this.postServices = new PostService();
+    this.postServices = container.get<IPostService>("PostService");
   }
 
   public async createPost(

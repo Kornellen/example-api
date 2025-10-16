@@ -1,15 +1,17 @@
 import { HttpError } from "../helpers/HttpError";
-import { CommentRepository } from "../repositories/comment.repository";
+import { ICommentRepository } from "../repositories/interfaces/ICommentRepository";
+import { ICommentService } from "./interfaces/ICommentService";
 
-export class CommentService {
+export class CommentService implements ICommentService {
   // Adds new comment to Database
+  constructor(private commentRepo: ICommentRepository) {}
   public async addComment(
     userId: string,
     content: string,
     postId: number
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     try {
-      return await CommentRepository.createComment(userId, postId, content);
+      return await this.commentRepo.createComment(userId, postId, content);
     } catch (error) {
       console.error(error);
       throw error;
@@ -20,8 +22,8 @@ export class CommentService {
   public async removeComment(
     commentId: number,
     userId: string
-  ): Promise<IReturnMessage> {
-    const comment = await CommentRepository.findCommentById(commentId);
+  ): Promise<ReturnMessage> {
+    const comment = await this.commentRepo.findCommentById(commentId);
 
     if (!userId) {
       throw new HttpError("Bad request", 400);
@@ -35,15 +37,15 @@ export class CommentService {
       throw new HttpError("Comment not found", 404);
     }
 
-    return await CommentRepository.removeComment(commentId, userId);
+    return await this.commentRepo.removeComment(commentId);
   }
 
   // Update content of comment with proper id
   public async updateComment(
     commentId: number,
     changes: { content: string }
-  ): Promise<IReturnMessage> {
-    const comment = await CommentRepository.findCommentById(commentId);
+  ): Promise<ReturnMessage> {
+    const comment = await this.commentRepo.findCommentById(commentId);
 
     if (!comment) {
       throw new HttpError("Comment not found", 404);
@@ -57,21 +59,21 @@ export class CommentService {
       throw new HttpError("Bad Request", 400);
     }
 
-    return await CommentRepository.editComment(comment, changes);
+    return await this.commentRepo.editComment(comment, changes);
   }
 
   // Like or Dislike proper comment (Adds or remove like from Database)
   public async likeComment(
     commentId: number,
     userId: string
-  ): Promise<IReturnMessage> {
-    const like = await CommentRepository.findLikeByCommentAndUserId(
+  ): Promise<ReturnMessage> {
+    const like = await this.commentRepo.findLikeByCommentAndUserId(
       commentId,
       userId
     );
 
-    if (like) return await CommentRepository.dislikeComment(like);
+    if (like) return await this.commentRepo.dislikeComment(like);
 
-    return await CommentRepository.likeComment(commentId, userId);
+    return await this.commentRepo.likeComment(commentId, userId);
   }
 }

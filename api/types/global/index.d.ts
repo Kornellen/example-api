@@ -1,7 +1,7 @@
 declare global {
-  interface IReturnMessage {
+  type ReturnMessage = {
     message: string;
-  }
+  };
 }
 
 export {};

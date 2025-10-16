@@ -1,11 +1,11 @@
 import { NextFunction, Response } from "express";
-import { CommentService } from "../services/comment.services";
+import { ICommentService } from "../services/interfaces/ICommentService";
+import { container } from "../../utils/infrastructure/DIContainer";
 
 export class CommentController {
-  private commentService: CommentService;
-
+  private commentService: ICommentService;
   constructor() {
-    this.commentService = new CommentService();
+    this.commentService = container.get<ICommentService>("CommentService");
   }
 
   public async createComment(req: any, res: Response, next: NextFunction) {

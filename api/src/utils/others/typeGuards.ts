@@ -1,6 +1,6 @@
 export function isUserToken(user: any): user is Express.UserToken {
   return (
-    user && typeof user.token === "string" && typeof user.user.id === "string"
+    user && typeof user.token === "string" && typeof user.userId === "string"
   );
 }
 

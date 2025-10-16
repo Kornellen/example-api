@@ -1,12 +1,11 @@
 import { Comment, CommentLike } from "@prisma/client";
 import { prisma } from "../../utils/infrastructure/prisma";
+import { ICommentRepository } from "./interfaces/ICommentRepository";
+import { CommentChanges } from "./types/comment.types";
 
-type CommentChanges = { content: string };
-
-export class CommentRepository {
-  public static async findCommentById(
-    commentId: number
-  ): Promise<Comment | null> {
+export class CommentRepository implements ICommentRepository {
+  constructor() {}
+  public async findCommentById(commentId: number): Promise<Comment | null> {
     return await prisma.comment.findUnique({
       where: {
         id: commentId,
@@ -14,11 +13,11 @@ export class CommentRepository {
     });
   }
 
-  public static async createComment(
+  public async createComment(
     userId: string,
     postId: number,
     content: string
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     await prisma.comment.create({
       data: {
         content,
@@ -30,10 +29,7 @@ export class CommentRepository {
     return { message: "Successfuly added comment" };
   }
 
-  public static async removeComment(
-    commentId: number,
-    userId: string
-  ): Promise<IReturnMessage> {
+  public async removeComment(commentId: number): Promise<ReturnMessage> {
     await prisma.comment.delete({
       where: {
         id: commentId,
@@ -43,10 +39,10 @@ export class CommentRepository {
     return { message: "Successfuly removed comment" };
   }
 
-  public static async editComment(
+  public async editComment(
     comment: Comment,
     changes: CommentChanges
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     if (
       Object.keys(changes).length === 0 ||
       comment.content === changes.content
@@ -67,7 +63,7 @@ export class CommentRepository {
     return { message: "Successfuly changed content of the comment" };
   }
 
-  public static async findLikeByCommentAndUserId(
+  public async findLikeByCommentAndUserId(
     commentId: number,
     userId: string
   ): Promise<CommentLike | null> {
@@ -79,10 +75,10 @@ export class CommentRepository {
     });
   }
 
-  public static async likeComment(
+  public async likeComment(
     commentId: number,
     userId: string
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     await prisma.commentLike.create({
       data: {
         commentId: commentId,
@@ -93,9 +89,7 @@ export class CommentRepository {
     return { message: "Successfuly liked comment" };
   }
 
-  public static async dislikeComment(
-    like: CommentLike
-  ): Promise<IReturnMessage> {
+  public async dislikeComment(like: CommentLike): Promise<ReturnMessage> {
     await prisma.commentLike.delete({
       where: {
         id: like.id,

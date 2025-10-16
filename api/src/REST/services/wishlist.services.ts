@@ -11,13 +11,13 @@ export class WishlistServices {
   public async addProductToWishlist(
     wishlistId: number,
     productId: string
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     return WishlistRepository.addProductToWishlist(productId, wishlistId);
   }
 
   public async removeProductFromWishlist(
     wishlistProductId: number
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     return WishlistRepository.removeProductFromWishlist(wishlistProductId);
   }
 }

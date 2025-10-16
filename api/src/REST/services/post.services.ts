@@ -1,7 +1,9 @@
 import { HttpError } from "../helpers/HttpError";
-import { PostRepository } from "../repositories/post.repository";
+import { IPostRepository } from "../repositories/interfaces/IPostRepository";
+import { IPostService } from "./interfaces/IPostService";
 
-export class PostService {
+export class PostService implements IPostService {
+  constructor(private postRepo: IPostRepository) {}
   public async createPost(
     userId: string,
     title: string,
@@ -9,7 +11,7 @@ export class PostService {
     content: string
   ): Promise<{ message: string; postId: number }> {
     try {
-      const newPost = await PostRepository.createPost(
+      const newPost = await this.postRepo.createPost(
         title,
         content,
         published,
@@ -24,13 +26,13 @@ export class PostService {
   }
 
   // Changing Visability of the post (public, private)
-  public async changePostVisability(postId: number): Promise<IReturnMessage> {
+  public async changePostVisability(postId: number): Promise<ReturnMessage> {
     try {
-      const post = await PostRepository.findPostById(postId);
+      const post = await this.postRepo.findPostById(postId);
 
       if (!post) throw new HttpError("Post Not Found", 404);
 
-      return await PostRepository.changePostVisability(post);
+      return await this.postRepo.changePostVisability(post);
     } catch (error) {
       throw error;
     }
@@ -40,14 +42,14 @@ export class PostService {
   public async likePost(
     userId: string,
     postId: number
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     try {
-      const like = await PostRepository.findPostLikeByUserAndId(postId, userId);
+      const like = await this.postRepo.findPostLikeByUserAndId(postId, userId);
 
       // Checking if user liked post before. If yes, remove like
-      if (like) return PostRepository.dislikePost(like.id);
+      if (like) return this.postRepo.dislikePost(like.id);
 
-      return await PostRepository.likePost(postId, userId);
+      return await this.postRepo.likePost(postId, userId);
     } catch (error) {
       throw error;
     }
@@ -55,7 +57,7 @@ export class PostService {
 
   // Getting Post Datas
   public async getPostData(postId: number) {
-    const post = await PostRepository.loadPostData(postId);
+    const post = await this.postRepo.loadPostData(postId);
 
     if (!post) return { error: "Post Not Found" };
 
@@ -67,16 +69,16 @@ export class PostService {
     postId: number,
     userId: string,
     change: { title: string | null; content: string | null }
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     try {
-      const post = await PostRepository.findPostById(postId);
+      const post = await this.postRepo.findPostById(postId);
 
       if (!post) throw new HttpError("Post Not Found", 404);
 
       if (post.authorId !== userId)
         throw new HttpError("Invalid Credentials", 401);
 
-      return PostRepository.updatePost(postId, change);
+      return this.postRepo.updatePost(postId, change);
     } catch (error) {
       console.error(error);
       throw error;
@@ -87,19 +89,19 @@ export class PostService {
   public async removePost(
     postId: number,
     userId: string
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     if (!postId || !userId) throw new HttpError("Bad Request", 400);
 
-    const post = await PostRepository.findPostByAuthorAndId(postId, userId);
+    const post = await this.postRepo.findPostByAuthorAndId(postId, userId);
 
     if (!post) throw new HttpError("Post Not Found", 404);
 
-    return await PostRepository.removePost(post, userId);
+    return await this.postRepo.removePost(post, userId);
   }
 
   // Fetching public posts
   public async getPublicPost() {
-    const posts = await PostRepository.findPublicPosts();
+    const posts = await this.postRepo.findPublicPosts();
 
     return posts;
   }

@@ -1,22 +1,15 @@
 import { Post, PostLike } from "@prisma/client";
 import { prisma } from "../../utils/infrastructure/prisma";
+import { IPostRepository } from "./interfaces/IPostRepository";
+import { PublicPosts } from "./types/post.types";
 
-type PublicPostsType =
-  | {
-      createdAt: Date;
-      content: string;
-      author: { username: string };
-      title: string;
-      _count: { likes: number; comments: number };
-    }[]
-  | null;
-
-export class PostRepository {
-  public static async findPostById(postId: number): Promise<Post | null> {
+export class PostRepository implements IPostRepository {
+  constructor() {}
+  public async findPostById(postId: number): Promise<Post | null> {
     return await prisma.post.findUnique({ where: { id: postId } });
   }
 
-  public static async findPostByAuthorAndId(
+  public async findPostByAuthorAndId(
     postId: number,
     userId: string
   ): Promise<Post | null> {
@@ -27,7 +20,7 @@ export class PostRepository {
       },
     });
   }
-  public static async findPostLikeByUserAndId(
+  public async findPostLikeByUserAndId(
     postId: number,
     userId: string
   ): Promise<PostLike | null> {
@@ -39,7 +32,7 @@ export class PostRepository {
     });
   }
 
-  public static async findPublicPosts(): Promise<PublicPostsType> {
+  public async findPublicPosts(): Promise<PublicPosts> {
     return await prisma.post.findMany({
       select: {
         createdAt: true,
@@ -63,7 +56,7 @@ export class PostRepository {
     });
   }
 
-  public static async createPost(
+  public async createPost(
     title: string,
     content: string,
     published: boolean,
@@ -81,10 +74,10 @@ export class PostRepository {
     });
   }
 
-  public static async updatePost(
+  public async updatePost(
     postId: number,
     change: { title: string | null; content: string | null }
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     let updateData: any = {};
 
     if (change.title !== null) {
@@ -109,9 +102,7 @@ export class PostRepository {
     return { message: "Successfully updated" };
   }
 
-  public static async changePostVisability(
-    post: Post
-  ): Promise<IReturnMessage> {
+  public async changePostVisability(post: Post): Promise<ReturnMessage> {
     await prisma.post.update({
       data: {
         published: !post.published,
@@ -123,10 +114,7 @@ export class PostRepository {
     return { message: "Successfully chaged post visabilty" };
   }
 
-  public static async removePost(
-    post: Post,
-    userId: string
-  ): Promise<IReturnMessage> {
+  public async removePost(post: Post, userId: string): Promise<ReturnMessage> {
     await prisma.post.delete({
       where: {
         id: post.id,
@@ -137,7 +125,7 @@ export class PostRepository {
     return { message: "Succesfully removed post" };
   }
 
-  public static async likePost(
+  public async likePost(
     postId: number,
     userId: string
   ): Promise<{ message: string }> {
@@ -151,7 +139,7 @@ export class PostRepository {
     return { message: "Liked" };
   }
 
-  public static async dislikePost(likeId: number): Promise<IReturnMessage> {
+  public async dislikePost(likeId: number): Promise<ReturnMessage> {
     await prisma.postLike.delete({
       where: {
         id: likeId,
@@ -161,7 +149,7 @@ export class PostRepository {
     return { message: "Disliked" };
   }
 
-  public static async loadPostData(postId: number) {
+  public async loadPostData(postId: number) {
     return await prisma.post.findUnique({
       where: {
         id: postId,

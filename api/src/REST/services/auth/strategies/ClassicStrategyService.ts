@@ -8,7 +8,7 @@ export class ClassicStrategyService {
     username: string,
     email: string,
     password: string
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     try {
       const existingUser: User | null = await prisma.user.findFirst({
         where: {

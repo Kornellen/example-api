@@ -1,6 +1,10 @@
 import path from "path";
+
 import dotenv from "dotenv";
+dotenv.config({ quiet: false });
+
 import colors from "colors";
+import "./utils/infrastructure/bindings";
 import express, { Express, Router } from "express";
 import { routers } from "./REST/routes/routes";
 import { errorHandler } from "./REST/middlewares/errorHandler";
@@ -16,7 +20,6 @@ import { methodTime } from "./utils/decorators";
 import { InitializeConfigs, logger } from "./utils/config";
 
 colors.enabled;
-dotenv.config();
 
 class App {
   protected cert: SSLType | undefined = undefined;
@@ -65,7 +68,7 @@ class App {
 
   @methodTime()
   public init() {
-    console.clear();
+    // console.clear();
     const googleStrategy = new GoogleStrategyService();
     PassportManager.configureGoogleStrategy(googleStrategy);
 

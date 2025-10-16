@@ -66,7 +66,7 @@ export class UserRepository {
   public static async modifyUserData(
     dataToModify: object,
     userId: string
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     let changesObj: any = {};
 
     if (Object.keys(dataToModify).length === 0)
@@ -96,7 +96,7 @@ export class UserRepository {
   public static async deleteUser(
     user: User,
     password: string
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     if (
       user.loginMethodId === 2 &&
       (!password ||

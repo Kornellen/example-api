@@ -8,7 +8,7 @@ export class AuthService {
     username: string,
     email: string,
     password: string
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     return this.classicStrategyService.registry(username, email, password);
   }
 

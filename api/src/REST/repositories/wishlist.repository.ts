@@ -17,7 +17,7 @@ export class WishlistRepository {
   public static async addProductToWishlist(
     productId: string,
     wishlistId: number
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     await prisma.wishlistProduct.create({
       data: {
         productId: productId,
@@ -30,7 +30,7 @@ export class WishlistRepository {
 
   public static async removeProductFromWishlist(
     wishlistProductId: number
-  ): Promise<IReturnMessage> {
+  ): Promise<ReturnMessage> {
     await prisma.wishlistProduct.delete({
       where: {
         id: wishlistProductId,
