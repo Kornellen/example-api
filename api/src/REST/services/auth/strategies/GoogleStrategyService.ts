@@ -1,9 +1,10 @@
 import { Profile, VerifyCallback } from "passport-google-oauth20";
 import { HttpError } from "../../../helpers/HttpError";
-import { SecurityManager } from "../../../../utils/security/SecurityManager";
+import { SecurityManager } from "@app/security";
 import { User } from "@prisma/client";
-import { UserRepository } from "../../../repositories/user.repository";
+import { IUserRepository } from "@app/interfaces/repositories";
 export class GoogleStrategyService {
+  constructor(private userRepository: IUserRepository) {}
   async login(profile: Profile, done: VerifyCallback): Promise<void> {
     try {
       if (!profile.emails || !profile.emails[0]?.value) {
@@ -12,10 +13,10 @@ export class GoogleStrategyService {
 
       let user: User | null;
 
-      user = await UserRepository.findUserByEmail(profile.emails[0].value);
+      user = await this.userRepository.findUserByEmail(profile.emails[0].value);
 
       if (!user) {
-        user = await UserRepository.createUser(
+        user = await this.userRepository.createUser(
           profile.emails[0].value,
           profile.displayName,
           "Social"

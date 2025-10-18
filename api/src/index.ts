@@ -18,12 +18,26 @@ import {
 import { CertificatesManager, EnvironmentManager } from "./utils/env";
 import { methodTime } from "./utils/decorators";
 import { InitializeConfigs, logger } from "./utils/config";
+import { container } from "./utils/infrastructure/DIContainer";
 
 colors.enabled;
 
 class App {
-  protected cert: SSLType | undefined = undefined;
+  private _cert: SSLType | undefined;
+  protected set cert(crt: SSLType | undefined) {
+    if (!crt) {
+      console.warn(
+        "HTTPS Server cannot be initialized without proper SSL Certificate"
+          .bgYellow
+      );
+    }
 
+    this._cert = crt;
+  }
+
+  protected get cert() {
+    return this._cert;
+  }
   constructor(
     protected readonly app: Express = express(),
     private readonly routes: Router[] = routers,
@@ -44,15 +58,10 @@ class App {
 
     if (CertificatesManager.isAvailble())
       this.cert = CertificatesManager.loadSSLCert();
+    else this.cert = undefined;
 
     if (this.cert)
       new HTTPSServer().initialize(this.app, this.port + 1, this.cert);
-    else {
-      console.log(
-        "HTTPS Server cannot be initialized without proper SSL Certificate"
-          .bgYellow
-      );
-    }
   }
 
   @methodTime()
@@ -68,8 +77,9 @@ class App {
 
   @methodTime()
   public init() {
-    // console.clear();
-    const googleStrategy = new GoogleStrategyService();
+    const googleStrategy = container.get<GoogleStrategyService>(
+      "GoogleStrategyService"
+    );
     PassportManager.configureGoogleStrategy(googleStrategy);
 
     logger.log("info", colors.blue(InitializeConfigs.generateStartMessage()));

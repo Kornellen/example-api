@@ -1,23 +1,24 @@
 import { WishlistProduct } from "@prisma/client";
-import { WishlistRepository } from "../repositories/wishlist.repository";
+import { IWishlistRepository } from "@app/interfaces/repositories";
 
-export class WishlistServices {
+export class WishlistService {
+  constructor(private wishlistRepository: IWishlistRepository) {}
   public async getWishlistProducts(
     userId: string
   ): Promise<WishlistProduct[] | null> {
-    return await WishlistRepository.getWishlistProducts(userId);
+    return await this.wishlistRepository.getWishlistProducts(userId);
   }
 
   public async addProductToWishlist(
     wishlistId: number,
     productId: string
   ): Promise<ReturnMessage> {
-    return WishlistRepository.addProductToWishlist(productId, wishlistId);
+    return this.wishlistRepository.addProductToWishlist(productId, wishlistId);
   }
 
   public async removeProductFromWishlist(
     wishlistProductId: number
   ): Promise<ReturnMessage> {
-    return WishlistRepository.removeProductFromWishlist(wishlistProductId);
+    return this.wishlistRepository.removeProductFromWishlist(wishlistProductId);
   }
 }

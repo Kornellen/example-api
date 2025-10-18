@@ -1,30 +1,65 @@
-import { CommentRepository } from "../../REST/repositories/comment.repository";
 import {
-  ICommentRepository,
-  IPostRepository,
-} from "../../REST/repositories/interfaces";
-import { PostRepository } from "../../REST/repositories/post.repository";
-import { CommentService } from "../../REST/services/comment.services";
-import { ICommentService, IPostService } from "../../REST/services/interfaces";
-import { PostService } from "../../REST/services/post.services";
+  CommentRepository,
+  PostRepository,
+  UserRepository,
+  WishlistRepository,
+} from "@app/repositories";
+import {
+  CommentService,
+  PostService,
+  UserService,
+  WishlistService,
+} from "@app/services";
+import { logger } from "../config";
 import { container } from "./DIContainer";
+import { GoogleStrategyService } from "src/REST/services/auth/strategies/GoogleStrategyService";
+import { ClassicStrategyService } from "src/REST/services/auth/strategies/ClassicStrategyService";
 
-container.bind<ICommentRepository>(
-  "ICommentRepository",
-  () => new CommentRepository()
+type RepoBinds = { token: string; fact: () => any }[];
+type ServiceBinds = { token: string; repoToken: string; service: any }[];
+
+const reposBinds: RepoBinds = [
+  {
+    token: "ICommentRepository",
+    fact: () => new CommentRepository(),
+  },
+  { token: "IPostRepository", fact: () => new PostRepository() },
+  { token: "IUserRepository", fact: () => new UserRepository() },
+  { token: "IWishlistRepository", fact: () => new WishlistRepository() },
+];
+reposBinds.forEach((repo) => container.bind(repo.token, repo.fact));
+
+const servicesBinds: ServiceBinds = [
+  {
+    token: "GoogleStrategyService",
+    repoToken: "IUserRepository",
+    service: GoogleStrategyService,
+  },
+  {
+    token: "ClassicStrategyService",
+    repoToken: "IUserRepository",
+    service: ClassicStrategyService,
+  },
+  {
+    token: "CommentService",
+    repoToken: "ICommentRepository",
+    service: CommentService,
+  },
+  { token: "PostService", repoToken: "IPostRepository", service: PostService },
+  { token: "UserService", repoToken: "IUserRepository", service: UserService },
+  {
+    token: "WishlistService",
+    repoToken: "IWishlistRepository",
+    service: WishlistService,
+  },
+];
+
+servicesBinds.forEach((servc) =>
+  container.bind(servc.token, (c) => {
+    logger.info(`Initializing Service: ${servc.token}`);
+    const repo = c.get(servc.repoToken);
+
+    return new servc.service(repo);
+  })
 );
-
-container.bind<ICommentService>("CommentService", (c) => {
-  const repo = c.get<ICommentRepository>("ICommentRepository");
-
-  return new CommentService(repo);
-});
-
-container.bind<IPostRepository>("IPostRepository", () => new PostRepository());
-
-container.bind<IPostService>("PostService", (c) => {
-  const repo = c.get<IPostRepository>("IPostRepository");
-  return new PostService(repo);
-});
-
 export default {};

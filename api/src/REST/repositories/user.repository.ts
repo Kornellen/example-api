@@ -1,10 +1,11 @@
 import { User } from "@prisma/client";
-import { prisma } from "../../utils/infrastructure/prisma";
+import { prisma } from "@app/db";
 import { HttpError } from "../helpers/HttpError";
-import { SecurityManager } from "../../utils/security/SecurityManager";
-
-export class UserRepository {
-  public static async findUserByEmail(email: string): Promise<User | null> {
+import { SecurityManager } from "@app/security";
+import { IUserRepository } from "@app/interfaces/repositories";
+export class UserRepository implements IUserRepository {
+  constructor() {}
+  public async findUserByEmail(email: string): Promise<User | null> {
     return await prisma.user.findUnique({
       where: {
         email: email,
@@ -12,9 +13,7 @@ export class UserRepository {
     });
   }
 
-  public static async findUserByEmailOrUsername(
-    login: string
-  ): Promise<User | null> {
+  public async findUserByEmailOrUsername(login: string): Promise<User | null> {
     return await prisma.user.findFirst({
       where: {
         OR: [{ username: login }, { email: login }],
@@ -22,7 +21,7 @@ export class UserRepository {
     });
   }
 
-  public static async findUserById(userId: string): Promise<User | null> {
+  public async findUserById(userId: string): Promise<User | null> {
     return await prisma.user.findUnique({
       where: {
         id: userId,
@@ -30,7 +29,7 @@ export class UserRepository {
     });
   }
 
-  public static async createUser(
+  public async createUser(
     email: string,
     username: string,
     type: "Classic" | "Social",
@@ -54,7 +53,10 @@ export class UserRepository {
     });
   }
 
-  public static async getUserData(userId: string, additonalSettings: object) {
+  public async getUserData(
+    userId: string,
+    additonalSettings: object
+  ): Promise<User | null> {
     return await prisma.user.findUnique({
       where: {
         id: userId,
@@ -63,7 +65,7 @@ export class UserRepository {
     });
   }
 
-  public static async modifyUserData(
+  public async modifyUserData(
     dataToModify: object,
     userId: string
   ): Promise<ReturnMessage> {
@@ -93,7 +95,7 @@ export class UserRepository {
     };
   }
 
-  public static async deleteUser(
+  public async deleteUser(
     user: User,
     password: string
   ): Promise<ReturnMessage> {

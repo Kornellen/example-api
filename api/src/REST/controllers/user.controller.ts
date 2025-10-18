@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import { UserService } from "../services/user.services";
+import { container } from "src/utils/infrastructure/DIContainer";
+import { IUserService } from "@app/interfaces/services";
 
 export class UserController {
-  private userService: UserService;
+  private userService: IUserService;
 
   constructor() {
-    this.userService = new UserService();
+    this.userService = container.get<IUserService>("UserService");
   }
 
   public async getUserPrivateData(req: any, res: Response, next: NextFunction) {

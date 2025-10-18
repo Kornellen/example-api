@@ -1,13 +1,14 @@
 import { NextFunction, Request, Response } from "express";
-import { WishlistServices } from "../services/wishlist.services";
 import { HttpError } from "../helpers/HttpError";
 import { isUserToken } from "../../utils/others/typeGuards";
+import { container } from "src/utils/infrastructure/DIContainer";
+import { IWishlistService } from "@app/interfaces/services";
 
 export class WishlistController {
-  private wishlistService: WishlistServices;
+  private wishlistService: IWishlistService;
 
   constructor() {
-    this.wishlistService = new WishlistServices();
+    this.wishlistService = container.get<IWishlistService>("WishlistService");
   }
 
   public async getWishlistProducts(

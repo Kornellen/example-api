@@ -1,15 +1,10 @@
 import { HttpError } from "../helpers/HttpError";
-import { UserRepository } from "../repositories/user.repository";
+import { IUserRepository } from "@app/interfaces/repositories";
+import { IUserService } from "@app/interfaces/services";
+import { ChangesType } from "./types/user.types";
 
-type ChangesType = {
-  username: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  city: string | null;
-  age: string | null;
-};
-
-export class UserService {
+export class UserService implements IUserService {
+  constructor(private userRepository: IUserRepository) {}
   // Returns users private data
   public async getPrivateData(userId: string): Promise<any> {
     const settings = {
@@ -23,7 +18,7 @@ export class UserService {
         },
       },
     };
-    const user = await UserRepository.getUserData(userId, settings);
+    const user = await this.userRepository.getUserData(userId, settings);
 
     if (!user) throw new HttpError("User not found", 404);
 
@@ -67,28 +62,28 @@ export class UserService {
       },
     };
 
-    const user = await UserRepository.findUserById(userId);
+    const user = await this.userRepository.findUserById(userId);
 
     if (!user) throw new HttpError("User not found", 404);
 
-    return await UserRepository.getUserData(userId, settings);
+    return await this.userRepository.getUserData(userId, settings);
   }
 
   // Manipulating user data
   public async modifyData(userId: string, changes: ChangesType) {
-    const user = await UserRepository.findUserById(userId);
+    const user = await this.userRepository.findUserById(userId);
 
     if (!user) throw new HttpError("User Not Found!", 404);
 
-    return await UserRepository.modifyUserData(changes, userId);
+    return await this.userRepository.modifyUserData(changes, userId);
   }
 
   // Deleting user account
   public async deleteAccount(userId: string, password: string) {
-    const user = await UserRepository.findUserById(userId);
+    const user = await this.userRepository.findUserById(userId);
 
     if (!user) throw new HttpError("User Not Found", 404);
 
-    return await UserRepository.deleteUser(user, password);
+    return await this.userRepository.deleteUser(user, password);
   }
 }

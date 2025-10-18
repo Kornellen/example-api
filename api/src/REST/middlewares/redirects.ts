@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 
 export const redirectToApi = (req: Request, res: Response, next: any) => {
   let newUrl = "";
-  if (!req.url.includes("/api/")) {
+  const regex = /(^|\/)api(\/|$)/;
+  if (!regex.test(req.url)) {
     const host = req.headers.host;
     const originalPath = req.originalUrl;
 

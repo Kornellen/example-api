@@ -1,6 +1,6 @@
 import { Comment, CommentLike } from "@prisma/client";
-import { prisma } from "../../utils/infrastructure/prisma";
-import { ICommentRepository } from "./interfaces/ICommentRepository";
+import { prisma } from "@app/db";
+import { ICommentRepository } from "@app/interfaces/repositories";
 import { CommentChanges } from "./types/comment.types";
 
 export class CommentRepository implements ICommentRepository {

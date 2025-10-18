@@ -13,6 +13,16 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "typeRoots": ["./types", "./node_modules/@types"]
+    "typeRoots": ["./types", "./node_modules/@types"],
+    "baseUrl": "./",
+    "paths": {
+      "@app/db": ["src/utils/infrastructure/prisma"],
+      "@app/env": ["src/utils/env"],
+      "@app/security": ["src/utils/security/SecurityManager"],
+      "@app/services": ["src/REST/services"],
+      "@app/repositories": ["src/REST/repositories"],
+      "@app/interfaces/services": ["src/REST/services/interfaces"],
+      "@app/interfaces/repositories": ["src/REST/repositories/interfaces"]
+    }
   }
 }

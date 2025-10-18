@@ -1,6 +1,6 @@
 import { HttpError } from "../helpers/HttpError";
-import { ICommentRepository } from "../repositories/interfaces/ICommentRepository";
-import { ICommentService } from "./interfaces/ICommentService";
+import { ICommentRepository } from "@app/interfaces/repositories";
+import { ICommentService } from "@app/interfaces/services";
 
 export class CommentService implements ICommentService {
   // Adds new comment to Database

@@ -1,9 +1,10 @@
 import { User } from "@prisma/client";
-import { prisma } from "../../../../utils/infrastructure/prisma";
+import { prisma } from "@app/db";
 import { HttpError } from "../../../helpers/HttpError";
-import { SecurityManager } from "../../../../utils/security/SecurityManager";
-import { UserRepository } from "../../../repositories/user.repository";
+import { SecurityManager } from "@app/security";
+import { IUserRepository } from "@app/interfaces/repositories";
 export class ClassicStrategyService {
+  constructor(private userRepository: IUserRepository) {}
   public async registry(
     username: string,
     email: string,
@@ -25,7 +26,7 @@ export class ClassicStrategyService {
         password
       );
 
-      await UserRepository.createUser(
+      await this.userRepository.createUser(
         email,
         username,
         "Classic",
@@ -44,7 +45,7 @@ export class ClassicStrategyService {
   ): Promise<Express.UserToken> {
     try {
       const existingUser: User | null =
-        await UserRepository.findUserByEmailOrUsername(login);
+        await this.userRepository.findUserByEmailOrUsername(login);
 
       if (
         !existingUser ||

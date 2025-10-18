@@ -1,6 +1,6 @@
 import { Post, PostLike } from "@prisma/client";
-import { prisma } from "../../utils/infrastructure/prisma";
-import { IPostRepository } from "./interfaces/IPostRepository";
+import { prisma } from "@app/db";
+import { IPostRepository } from "@app/interfaces/repositories";
 import { PublicPosts } from "./types/post.types";
 
 export class PostRepository implements IPostRepository {

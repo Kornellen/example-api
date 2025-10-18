@@ -1,5 +1,5 @@
 import { Post, PostLike } from "@prisma/client";
-import { PublicPostsType } from "../types/post.types";
+import { PublicPosts } from "../types/post.types";
 
 export interface IPostRepository {
   findPostById(postId: number): Promise<Post | null>;
@@ -10,7 +10,7 @@ export interface IPostRepository {
     userId: string
   ): Promise<PostLike | null>;
 
-  findPublicPosts(): Promise<PublicPostsType>;
+  findPublicPosts(): Promise<PublicPosts>;
 
   createPost(
     title: string,

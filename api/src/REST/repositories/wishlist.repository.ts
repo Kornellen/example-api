@@ -1,8 +1,9 @@
 import { WishlistProduct } from "@prisma/client";
-import { prisma } from "../../utils/infrastructure/prisma";
-
-export class WishlistRepository {
-  public static async getWishlistProducts(
+import { IWishlistRepository } from "@app/interfaces/repositories";
+import { prisma } from "@app/db";
+export class WishlistRepository implements IWishlistRepository {
+  constructor() {}
+  public async getWishlistProducts(
     userId: string
   ): Promise<WishlistProduct[] | null> {
     return await prisma.wishlistProduct.findMany({
@@ -14,7 +15,7 @@ export class WishlistRepository {
     });
   }
 
-  public static async addProductToWishlist(
+  public async addProductToWishlist(
     productId: string,
     wishlistId: number
   ): Promise<ReturnMessage> {
@@ -28,7 +29,7 @@ export class WishlistRepository {
     return { message: "Product Added to wishlist" };
   }
 
-  public static async removeProductFromWishlist(
+  public async removeProductFromWishlist(
     wishlistProductId: number
   ): Promise<ReturnMessage> {
     await prisma.wishlistProduct.delete({

@@ -1,6 +1,6 @@
 import { HttpError } from "../helpers/HttpError";
-import { IPostRepository } from "../repositories/interfaces/IPostRepository";
-import { IPostService } from "./interfaces/IPostService";
+import { IPostRepository } from "@app/interfaces/repositories";
+import { IPostService } from "@app/interfaces/services";
 
 export class PostService implements IPostService {
   constructor(private postRepo: IPostRepository) {}

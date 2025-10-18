@@ -1,5 +1,5 @@
 import { Comment, CommentLike } from "@prisma/client";
-import { CommentChanges } from "../comment.repository";
+import { CommentChanges } from "../types/comment.types";
 export interface ICommentRepository {
   findCommentById(commentId: number): Promise<Comment | null>;
 
@@ -7,17 +7,17 @@ export interface ICommentRepository {
     userId: string,
     postId: number,
     content: string
-  ): Promise<IReturnMessage>;
+  ): Promise<ReturnMessage>;
 
-  removeComment(commentId: number): Promise<IReturnMessage>;
+  removeComment(commentId: number): Promise<ReturnMessage>;
 
   editComment(
     comment: Comment,
     changes: CommentChanges
-  ): Promise<IReturnMessage>;
+  ): Promise<ReturnMessage>;
 
-  likeComment(commentId: number, userId: string): Promise<IReturnMessage>;
-  dislikeComment(like: CommentLike): Promise<IReturnMessage>;
+  likeComment(commentId: number, userId: string): Promise<ReturnMessage>;
+  dislikeComment(like: CommentLike): Promise<ReturnMessage>;
 
   findLikeByCommentAndUserId(
     commentId: number,

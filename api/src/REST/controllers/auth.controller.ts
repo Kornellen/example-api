@@ -3,11 +3,14 @@ import { AuthService } from "../services/auth/auth.services";
 import { isUserToken } from "../../utils/others/typeGuards";
 import { ClassicStrategyService } from "../services/auth/strategies/ClassicStrategyService";
 import { SecurityManager } from "../../utils/security/SecurityManager";
+import { container } from "src/utils/infrastructure/DIContainer";
 export class AuthController {
   private readonly authService: AuthService;
 
   constructor() {
-    const classicStrategyService = new ClassicStrategyService();
+    const classicStrategyService = container.get<ClassicStrategyService>(
+      "ClassicStrategyService"
+    );
     this.authService = new AuthService(classicStrategyService);
   }
 
