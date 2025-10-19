@@ -15,7 +15,6 @@ prisma/migrations
 prisma/migrations_lock.toml
 
 # tests
-__test__/
 *.http
 
 # logs

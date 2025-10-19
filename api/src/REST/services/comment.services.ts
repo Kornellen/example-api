@@ -25,16 +25,12 @@ export class CommentService implements ICommentService {
   ): Promise<ReturnMessage> {
     const comment = await this.commentRepo.findCommentById(commentId);
 
-    if (!userId) {
-      throw new HttpError("Bad request", 400);
+    if (!comment) {
+      throw new HttpError("Comment not found", 404);
     }
 
     if (userId !== comment?.authorId) {
       throw new HttpError("Unauthorized", 401);
-    }
-
-    if (!comment) {
-      throw new HttpError("Comment not found", 404);
     }
 
     return await this.commentRepo.removeComment(commentId);
