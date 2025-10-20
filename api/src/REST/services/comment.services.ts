@@ -43,17 +43,7 @@ export class CommentService implements ICommentService {
   ): Promise<ReturnMessage> {
     const comment = await this.commentRepo.findCommentById(commentId);
 
-    if (!comment) {
-      throw new HttpError("Comment not found", 404);
-    }
-
-    if (
-      typeof changes === undefined ||
-      typeof changes === null ||
-      !changes.content
-    ) {
-      throw new HttpError("Bad Request", 400);
-    }
+    if (!comment) throw new HttpError("Comment not found", 404);
 
     return await this.commentRepo.editComment(comment, changes);
   }

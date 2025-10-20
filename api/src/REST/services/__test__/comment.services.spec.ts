@@ -27,7 +27,7 @@ const otherUserId = "gwe6236589cxs";
 
 describe("CommentService", () => {
   describe("createComment ", () => {
-    it("should create comment and return response", async () => {
+    it("should create comment", async () => {
       const expectedMsg = { message: "Successfuly added comment" };
 
       mockRepo.createComment.mockResolvedValue(expectedMsg);
@@ -82,6 +82,45 @@ describe("CommentService", () => {
       await expect(
         service.removeComment(mockComment.id, otherUserId)
       ).rejects.toMatchObject({ message: "Unauthorized", statusCode: 401 });
+    });
+  });
+  describe("updateComment", () => {
+    const changes = { content: "New Content" };
+    it("should update comment", async () => {
+      const expectedMsg = {
+        message: "Successfuly changed content of the comment",
+      };
+
+      mockRepo.findCommentById.mockResolvedValue(mockComment);
+
+      mockRepo.editComment.mockResolvedValue(expectedMsg);
+
+      const result = await service.updateComment(mockComment.id, changes);
+
+      expect(result).toEqual(expectedMsg);
+    });
+
+    it("should throw 404 http error", async () => {
+      mockRepo.findCommentById.mockResolvedValue(null);
+
+      await expect(
+        service.updateComment(mockComment.id, changes)
+      ).rejects.toMatchObject({
+        message: "Comment not found",
+        statusCode: 404,
+      });
+    });
+
+    it("should inform about changing nothing", async () => {
+      const changes = { content: mockComment.content };
+      const expectedMsg = { message: "Nothing changed" };
+      mockRepo.findCommentById.mockResolvedValue(mockComment);
+
+      mockRepo.editComment.mockResolvedValue(expectedMsg);
+
+      const result = await service.updateComment(mockComment.id, changes);
+
+      expect(result).toEqual(expectedMsg);
     });
   });
 });
