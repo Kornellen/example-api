@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { User } from "@app/db/models";
 import { prisma } from "@app/db";
 import { HttpError } from "../../../helpers/HttpError";
 import { SecurityManager } from "@app/security";

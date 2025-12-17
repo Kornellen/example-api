@@ -1,11 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
 }
+
 
 model User {
   id            String        @id @default(uuid())
@@ -22,12 +23,11 @@ model User {
   comments      Comment[]
   post_likes    PostLike[]
   posts         Post[]
-  products       Product[]
+  products      Product[]
   wishlist      Wishlist[]
   cart          Cart[]
-  loginMethod   loginmethod  @relation(fields: [loginMethodId], references: [id])
+  loginMethod   loginmethod   @relation(fields: [loginMethodId], references: [id])
 
-  @@index([loginMethodId], map: "users_loginMethodId_fkey")
   @@map("users")
 }
 
@@ -43,7 +43,6 @@ model Post {
   likes     PostLike[]
   author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  @@index([authorId], map: "posts_authorId_fkey")
   @@map("posts")
 }
 
@@ -56,8 +55,6 @@ model PostLike {
   post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId], map: "unique_post_like")
-  @@index([postId], map: "post_likes_postId_fkey")
-  @@index([userId], map: "post_likes_userId_fkey")
   @@map("post_likes")
 }
 
@@ -70,7 +67,6 @@ model CommentLike {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, commentId], map: "comment_likes_userId_commentId_key")
-  @@index([commentId], map: "comment_likes_commentId_fkey")
   @@map("comment_likes")
 }
 
@@ -85,8 +81,6 @@ model Comment {
   author    User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
 
-  @@index([authorId], map: "comments_authorId_fkey")
-  @@index([postId], map: "comments_postId_fkey")
   @@map("comments")
 }
 

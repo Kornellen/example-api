@@ -2,7 +2,7 @@ import * as jwt from "jsonwebtoken";
 import { EnvironmentManager } from "../env/EnvironmentManager";
 import bcrypt from "bcrypt";
 import { Response } from "express";
-import { Role } from "@prisma/client";
+import { Role } from "@app/db/models";
 
 export class SecurityManager {
   private static readonly jwtSecret: string | undefined =

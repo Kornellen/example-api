@@ -1,7 +1,6 @@
 import path from "path";
 
-import dotenv from "dotenv";
-dotenv.config({ quiet: false });
+import "dotenv/config"
 
 import colors from "colors";
 import "./utils/infrastructure/bindings";

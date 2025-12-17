@@ -1,7 +1,7 @@
 import { Profile, VerifyCallback } from "passport-google-oauth20";
 import { HttpError } from "../../../helpers/HttpError";
 import { SecurityManager } from "@app/security";
-import { User } from "@prisma/client";
+import { User } from "@app/db/models";
 import { IUserRepository } from "@app/interfaces/repositories";
 export class GoogleStrategyService {
   constructor(private userRepository: IUserRepository) {}

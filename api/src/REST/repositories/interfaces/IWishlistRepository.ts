@@ -1,4 +1,4 @@
-import { WishlistProduct } from "@prisma/client";
+import { WishlistProduct } from "@app/db/models";
 
 export interface IWishlistRepository {
   getWishlistProducts(userId: string): Promise<WishlistProduct[] | null>;

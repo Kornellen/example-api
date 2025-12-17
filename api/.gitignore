@@ -13,6 +13,7 @@ certificates/
 # prisma
 prisma/migrations
 prisma/migrations_lock.toml
+/src/generated/
 
 # tests
 *.http

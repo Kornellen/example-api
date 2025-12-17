@@ -1,0 +1,37 @@
+services:
+  api:
+    build: .
+    ports:
+      - "5174:5174"
+      - "5175:5175"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: 5174
+
+      JWT_SECRET: ${JWT_SECRET}
+
+      GOOGLE_AUTH_SECRET: ${GOOGLE_AUTH_SECRET}
+      GOOGLE_AUTH_ID: ${GOOGLE_AUTH_ID}
+
+      CALLBACK_URL: ${CALLBACK_URL}
+
+      GITHUB_AUTH_SECRET: ${GITHUB_AUTH_SECRET}
+      GITHUB_AUTH_ID: ${GITHUB_AUTH_ID}
+
+      NODE_ENV: ${NODE_ENV}
+    depends_on:
+      - db
+    command: sh /api/scripts/wait-for-db.sh
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: api
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

@@ -1,0 +1,16 @@
+logs/
+node_modules
+certificates/
+dist
+
+.env
+
+**/__test__/
+jest.config.ts
+
+*.md
+.git
+.gitignore
+LICENSE
+
+docker-compose*.yaml

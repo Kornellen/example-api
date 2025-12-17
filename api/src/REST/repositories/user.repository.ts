@@ -1,8 +1,8 @@
-import { User } from "@prisma/client";
 import { prisma } from "@app/db";
 import { HttpError } from "../helpers/HttpError";
 import { SecurityManager } from "@app/security";
 import { IUserRepository } from "@app/interfaces/repositories";
+import { User } from "@app/db/models";
 export class UserRepository implements IUserRepository {
   constructor() {}
   public async findUserByEmail(email: string): Promise<User | null> {

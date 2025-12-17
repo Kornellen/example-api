@@ -1,4 +1,4 @@
-import { WishlistProduct } from "@prisma/client";
+import { WishlistProduct } from "@app/db/models";
 import { IWishlistRepository } from "@app/interfaces/repositories";
 
 export class WishlistService {

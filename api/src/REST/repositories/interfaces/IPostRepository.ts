@@ -1,4 +1,4 @@
-import { Post, PostLike } from "@prisma/client";
+import { Post, PostLike } from "@app/db/models";
 import { PublicPosts } from "../types/post.types";
 
 export interface IPostRepository {

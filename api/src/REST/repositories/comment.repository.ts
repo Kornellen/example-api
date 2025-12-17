@@ -1,7 +1,7 @@
-import { Comment, CommentLike } from "@prisma/client";
 import { prisma } from "@app/db";
 import { ICommentRepository } from "@app/interfaces/repositories";
 import { CommentChanges } from "./types/comment.types";
+import { Comment, CommentLike } from "@app/db/models";
 
 export class CommentRepository implements ICommentRepository {
   constructor() {}

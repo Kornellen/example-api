@@ -1,6 +1,6 @@
-import { WishlistProduct } from "@prisma/client";
 import { IWishlistRepository } from "@app/interfaces/repositories";
 import { prisma } from "@app/db";
+import { WishlistProduct } from "@app/db/models";
 export class WishlistRepository implements IWishlistRepository {
   constructor() {}
   public async getWishlistProducts(

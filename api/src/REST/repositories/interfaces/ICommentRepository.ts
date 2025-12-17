@@ -1,4 +1,4 @@
-import { Comment, CommentLike } from "@prisma/client";
+import { Comment, CommentLike } from "@app/db/models";
 import { CommentChanges } from "../types/comment.types";
 export interface ICommentRepository {
   findCommentById(commentId: number): Promise<Comment | null>;
