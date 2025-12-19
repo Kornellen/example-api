@@ -3,7 +3,7 @@ node_modules
 certificates/
 dist
 
-.env
+#.env
 
 **/__test__/
 jest.config.ts

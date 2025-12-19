@@ -6,8 +6,6 @@ WORKDIR /api
 COPY . .
 RUN npm ci
 
-RUN npx prisma generate
-
 RUN apk add --no-cache postgresql-client
 
 RUN apk add --no-cache openssl
@@ -19,7 +17,8 @@ RUN mkdir -p /api/certificates && \
     -out   /api/certificates/cert.crt \
     -subj "/CN=localhost"
 
-EXPOSE 5174
-EXPOSE 5175
+EXPOSE 80 443 5050
 
-CMD ["npm", "run", "start:dev"]
+RUN chmod +x /api/scripts/wait-for-db.sh
+
+ENTRYPOINT ["/api/scripts/wait-for-db.sh"]

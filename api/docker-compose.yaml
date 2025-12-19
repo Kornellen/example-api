@@ -2,8 +2,8 @@ services:
   api:
     build: .
     ports:
-      - "5174:5174"
-      - "5175:5175"
+      - "80:5174"
+      - "443:5175"
     env_file:
       - .env
     environment:
@@ -23,9 +23,12 @@ services:
       NODE_ENV: ${NODE_ENV}
     depends_on:
       - db
-    command: sh /api/scripts/wait-for-db.sh
+    volumes:
+      - ./scripts:/api/scripts
   db:
     image: postgres:16
+    ports:
+      - "5050:5432"
     environment:
       POSTGRES_DB: api
       POSTGRES_USER: app
