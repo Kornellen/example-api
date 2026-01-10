@@ -31,6 +31,7 @@ postRouter.get(
   "/post/:id",
   [param("id").notEmpty()],
   validateRequst,
+  verifyJWT,
   (req: Request, res: Response, next: NextFunction) =>
     postController.getPostData(req, res, next)
 );

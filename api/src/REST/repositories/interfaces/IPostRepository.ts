@@ -32,5 +32,5 @@ export interface IPostRepository {
 
   dislikePost(likeId: number): Promise<ReturnMessage>;
 
-  loadPostData(postId: number): any;
+  loadPostData(postId: number, userId: string): any;
 }

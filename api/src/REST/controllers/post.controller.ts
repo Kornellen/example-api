@@ -46,11 +46,14 @@ export class PostController {
   ): Promise<void> {
     try {
       const { id } = req.params;
+      let userId;
 
-      if (isNaN(Number(id)) || !id) {
-        throw new HttpError("Bad Request", 400);
-      }
-      const response = await this.postServices.getPostData(Number(id));
+      if (!req.user || !isUserToken(req.user) || !req.user.userId) userId = "";
+      else userId = req.user.userId;
+
+      if (isNaN(Number(id)) || !id) throw new HttpError("Bad Request", 400);
+
+      const response = await this.postServices.getPostData(Number(id), userId);
 
       res.json(response);
     } catch (error) {

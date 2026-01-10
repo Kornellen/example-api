@@ -11,17 +11,17 @@ export class InitializeConfigs {
   public static generateStartMessage() {
     return `\n
 |-----------------------------------------------|
-| Initializing Backend Service        🔍        |
+| Initializing Backend Service\t\t🔍\t|
 |-----------------------------------------------|
 | App Environment: ${
       EnvironmentManager.isDev()
         ? colors.red(EnvironmentManager.NODE_ENV)
         : colors.green(EnvironmentManager.NODE_ENV)
-    }        ${this.initConfigs.envIcon}        |
+    }\t\t${this.initConfigs.envIcon}\t|
 |-----------------------------------------------|
-| Initialization Time: ${this.initConfigs.time}       🚀        |
+| Initialization Time: ${this.initConfigs.time}\t\t\t|
 |-----------------------------------------------|
-|© Kornellen ${this.initConfigs.year}                               |
+|© Kornellen ${this.initConfigs.year}\t\t\t|
 |-----------------------------------------------|\n`;
   }
 

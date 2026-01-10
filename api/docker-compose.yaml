@@ -20,11 +20,17 @@ services:
       GITHUB_AUTH_SECRET: ${GITHUB_AUTH_SECRET}
       GITHUB_AUTH_ID: ${GITHUB_AUTH_ID}
 
+      REDIS_HOST: ${REDIS_HOST}
+
+      REDIS_PORT: 6379
+
       NODE_ENV: ${NODE_ENV}
     depends_on:
       - db
+      - redis
     volumes:
       - ./scripts:/api/scripts
+      - ./src:/api/src
   db:
     image: postgres:16
     ports:
@@ -35,6 +41,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWD}
     volumes:
       - db_data:/var/lib/postgresql/data
-
+    stop_grace_period: 30s
+  redis:
+    image: redis:8
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
 volumes:
   db_data:

@@ -2,24 +2,37 @@ import { prisma } from "@app/db";
 import { IPostRepository } from "@app/interfaces/repositories";
 import { PublicPosts } from "./types/post.types";
 import { Post, PostLike } from "@app/db/models";
+import { cacheData } from "src/utils/infrastructure/cacheData";
+import { CommentDTO, LikeDTO, PostDTO } from "types/dtos/";
 
 export class PostRepository implements IPostRepository {
   constructor() {}
   public async findPostById(postId: number): Promise<Post | null> {
-    return await prisma.post.findUnique({ where: { id: postId } });
+    return cacheData(
+      `post:${postId}`,
+      (): Promise<Post | null> =>
+        prisma.post.findUnique({ where: { id: postId } }),
+      60
+    );
   }
 
   public async findPostByAuthorAndId(
     postId: number,
     userId: string
   ): Promise<Post | null> {
-    return await prisma.post.findUnique({
-      where: {
-        id: postId,
-        authorId: userId,
-      },
-    });
+    return cacheData(
+      `post:${postId}`,
+      async (): Promise<Post | null> =>
+        prisma.post.findUnique({
+          where: {
+            id: postId,
+            authorId: userId,
+          },
+        }),
+      60
+    );
   }
+
   public async findPostLikeByUserAndId(
     postId: number,
     userId: string
@@ -148,47 +161,24 @@ export class PostRepository implements IPostRepository {
 
     return { message: "Disliked" };
   }
-
-  public async loadPostData(postId: number) {
-    return await prisma.post.findUnique({
+  private async getPostBasic(postId: number, userId: string) {
+    return prisma.post.findFirst({
       where: {
         id: postId,
+        OR: [{ published: true }, { authorId: userId }],
       },
-      include: {
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        title: true,
+        content: true,
+        published: true,
+        authorId: true,
         author: {
           select: {
             username: true,
             role: true,
-          },
-        },
-        likes: {
-          include: {
-            user: {
-              select: {
-                username: true,
-              },
-            },
-            post: {
-              select: {
-                id: true,
-              },
-            },
-          },
-        },
-        comments: {
-          select: {
-            content: true,
-            createdAt: true,
-            author: {
-              select: {
-                username: true,
-              },
-            },
-            _count: {
-              select: {
-                likes: true,
-              },
-            },
           },
         },
         _count: {
@@ -199,5 +189,90 @@ export class PostRepository implements IPostRepository {
         },
       },
     });
+  }
+  private async getPostLikes(
+    postId: number
+  ): Promise<{ user: { username: string } }[]> {
+    return prisma.postLike.findMany({
+      where: { postId },
+      select: {
+        user: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+  }
+  private async getPostComments(postId: number) {
+    return prisma.comment.findMany({
+      where: { postId },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        author: {
+          select: { username: true },
+        },
+        _count: {
+          select: { likes: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+  public async loadPostData(
+    postId: number,
+    userId: string
+  ): Promise<PostDTO | null> {
+    const postBasic = await this.getPostBasic(postId, userId);
+
+    if (!postBasic) return null;
+
+    const cacheKey = postBasic.published
+      ? `post:public:${postId}`
+      : `post:private:${postId}:user:${userId}`;
+
+    const result = await cacheData(
+      cacheKey,
+      () =>
+        Promise.all([
+          Promise.resolve(postBasic),
+          this.getPostLikes(postId),
+          this.getPostComments(postId),
+        ]),
+      60
+    );
+
+    if (!result) return null;
+
+    const [post, likes, comments] = result;
+
+    const postDTO: PostDTO = {
+      id: post.id,
+      author: {
+        userId: post.authorId,
+        username: post.author.username,
+        role: post.author.role,
+      },
+      comments: comments.map(
+        (comment): CommentDTO => ({
+          content: comment.content,
+          createdAt: comment.createdAt,
+          likes: comment._count.likes,
+          username: comment.author.username,
+        })
+      ),
+      content: post.content,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      likes: likes.map((like): LikeDTO => ({ username: like.user.username })),
+      title: post.title,
+      numOfComments: post._count.comments,
+      numOfLikes: post._count.likes,
+      published: post.published,
+    };
+
+    return postDTO;
   }
 }

@@ -1,10 +1,12 @@
 FROM node:20-alpine
 
-WORKDIR /api
+RUN addgroup -S appgroup && adduser -S app -G appgroup
 
+WORKDIR /api
 
 COPY . .
 RUN npm ci
+RUN npm audit
 
 RUN apk add --no-cache postgresql-client
 
@@ -17,8 +19,12 @@ RUN mkdir -p /api/certificates && \
     -out   /api/certificates/cert.crt \
     -subj "/CN=localhost"
 
+    RUN chown -R app:appgroup /api
+
+USER app
+
 EXPOSE 80 443 5050
 
-RUN chmod +x /api/scripts/wait-for-db.sh
+RUN chmod 776 /api/scripts/wait-for-db.sh
 
 ENTRYPOINT ["/api/scripts/wait-for-db.sh"]

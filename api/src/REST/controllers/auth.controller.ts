@@ -49,10 +49,10 @@ export class AuthController {
     try {
       const { login, password } = req.body;
 
-      const { token } = await this.authService.login(login, password);
+      const { token, userId } = await this.authService.login(login, password);
 
       if (req.headers["content-type"] === "application/json") {
-        res.json({ token });
+        res.json({ token, userId });
         return;
       }
 

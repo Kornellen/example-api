@@ -21,7 +21,7 @@
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^22.19.3",
+    "@types/node": "^22.13.0",
     "@types/passport": "^1.0.17",
     "@types/passport-github2": "^1.2.9",
     "@types/passport-google-oauth20": "^2.0.16",
@@ -58,6 +58,7 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.3",
+    "redis": "^5.10.0",
     "winston": "^3.17.0",
     "ws": "^8.18.0"
   }

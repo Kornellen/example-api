@@ -63,7 +63,7 @@ export class ClassicStrategyService {
         existingUser.role
       );
 
-      return { token };
+      return { userId: existingUser.id, token };
     } catch (error: any) {
       throw new HttpError(error, 401);
     }

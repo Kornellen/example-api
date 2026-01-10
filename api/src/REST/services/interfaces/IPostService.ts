@@ -12,7 +12,7 @@ export interface IPostService {
 
   likePost(userId: string, postId: number): Promise<ReturnMessage>;
 
-  getPostData(postId: number): any;
+  getPostData(postId: number, userId: string): any;
 
   updatePost(
     postId: number,

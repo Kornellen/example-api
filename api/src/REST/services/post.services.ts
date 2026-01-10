@@ -1,6 +1,7 @@
 import { HttpError } from "../helpers/HttpError";
 import { IPostRepository } from "@app/interfaces/repositories";
 import { IPostService } from "@app/interfaces/services";
+import { PostDTO } from "types/dtos";
 
 export class PostService implements IPostService {
   constructor(private postRepo: IPostRepository) {}
@@ -56,8 +57,11 @@ export class PostService implements IPostService {
   }
 
   // Getting Post Datas
-  public async getPostData(postId: number) {
-    const post = await this.postRepo.loadPostData(postId);
+  public async getPostData(
+    postId: number,
+    userId: string
+  ): Promise<PostDTO | { error: string }> {
+    const post = await this.postRepo.loadPostData(postId, userId);
 
     if (!post) return { error: "Post Not Found" };
 
