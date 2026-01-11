@@ -17,13 +17,13 @@ export const redirectToApi = (req: Request, res: Response, next: any) => {
 export const redirectToHTTPS = (req: Request, res: Response, next: any) => {
   let newUrl = "";
 
-  if (req.protocol !== "https" && process.env.NODE_ENV === "production") {
+  if (req.protocol !== "https" && process.env.NODE_ENV !== "production") {
     const host = req.hostname;
     const path = req.path;
 
-    newUrl = `https://${host}:5175${path}`;
+    newUrl = `https://${host}${path}`;
 
-    return res.redirect(newUrl);
+    res.location(newUrl);
   }
   next();
 };

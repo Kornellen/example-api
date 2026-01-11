@@ -10,19 +10,19 @@ export class InitializeConfigs {
   };
   public static generateStartMessage() {
     return `\n
-|-----------------------------------------------|
-| Initializing Backend Service\t\t🔍\t |
-|-----------------------------------------------|
-| App Environment: ${
+|---------------------------------------------|
+| Backend Service\t\t🔍\t\t |
+|---------------------------------------------|
+| Environment: ${
       EnvironmentManager.isDev()
         ? colors.red(EnvironmentManager.NODE_ENV)
         : colors.green(EnvironmentManager.NODE_ENV)
     }\t\t${this.initConfigs.envIcon}\t |
-|-----------------------------------------------|
+|---------------------------------------------|
 | Initialization Time: ${this.initConfigs.time}\t\t |
-|-----------------------------------------------|
+|---------------------------------------------|
 | © Kornellen ${this.initConfigs.year}\t\t\t\t |
-|-----------------------------------------------|\n`;
+|---------------------------------------------|\n`;
   }
 
   public static preparePort() {

@@ -1,0 +1,55 @@
+services:
+  api:
+    image: my-prod-backend:1.0.1
+    container_name: api
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 5174
+
+      GOOGLE_AUTH_SECRET: ${GOOGLE_AUTH_SECRET}
+      GOOGLE_AUTH_ID: ${GOOGLE_AUTH_ID}
+      CALLBACK_URL: ${CALLBACK_URL}
+
+      GITHUB_AUTH_SECRET: ${GITHUB_AUTH_SECRET}
+      GITHUB_AUTH_ID: ${GITHUB_AUTH_ID}
+
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: 6379
+    depends_on:
+      - redis
+      - db
+  db:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    container_name: db
+    environment:
+      POSTGRES_DB: api
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    stop_grace_period: 30s
+
+  redis:
+    image: redis:8
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+  proxy:
+    image: nginx:stable
+    container_name: proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - api
+
+volumes:
+  db_data:
