@@ -1,4 +1,4 @@
-import { AuthorDTO } from "./AuthorDTO";
+import { AuthorDTO } from "./UserDTO";
 import { CommentDTO } from "./CommentDTO";
 import { LikeDTO } from "./LikeDTO";
 

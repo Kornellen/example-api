@@ -1,6 +1,6 @@
 import { ICommentRepository } from "@app/interfaces/repositories";
 import { CommentService } from "../comment.services";
-import { Comment } from "@prisma/client";
+import { Comment } from "@app/db/models";
 
 const mockRepo: jest.Mocked<ICommentRepository> = {
   createComment: jest.fn(),

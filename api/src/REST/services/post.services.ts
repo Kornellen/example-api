@@ -1,7 +1,9 @@
 import { HttpError } from "../helpers/HttpError";
 import { IPostRepository } from "@app/interfaces/repositories";
 import { IPostService } from "@app/interfaces/services";
-import { PostDTO } from "types/dtos";
+import { CommentDTO, LikeDTO, PostDTO } from "src/REST/services/types/dtos";
+import { Mapper } from "src/utils/others/DTOMapper";
+import { PostDetails, PublicPost } from "../repositories/types/post.types";
 
 export class PostService implements IPostService {
   constructor(private postRepo: IPostRepository) {}
@@ -61,11 +63,40 @@ export class PostService implements IPostService {
     postId: number,
     userId: string
   ): Promise<PostDTO | { error: string }> {
-    const post = await this.postRepo.loadPostData(postId, userId);
+    const result = await this.postRepo.loadPostData(postId, userId);
 
-    if (!post) return { error: "Post Not Found" };
+    if (!result) return { error: "Post Not Found" };
 
-    return post;
+    const postDTO: Mapper<PostDetails, PostDTO> = ([
+      post,
+      likes,
+      comments,
+    ]): PostDTO => ({
+      id: post.id,
+      author: {
+        userId: post.authorId,
+        username: post.author.username,
+        role: post.author.role,
+      },
+      comments: comments.map(
+        (comment): CommentDTO => ({
+          content: comment.content,
+          createdAt: comment.createdAt,
+          likes: comment._count.likes,
+          username: comment.author.username,
+        })
+      ),
+      content: post.content,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      likes: likes.map((like): LikeDTO => ({ id: like.id })),
+      title: post.title,
+      numOfComments: post._count.comments,
+      numOfLikes: post._count.likes,
+      published: post.published,
+    });
+
+    return postDTO(result);
   }
 
   // Updating post
@@ -104,7 +135,7 @@ export class PostService implements IPostService {
   }
 
   // Fetching public posts
-  public async getPublicPost() {
+  public async getPublicPost(): Promise<PublicPost[] | null> {
     const posts = await this.postRepo.findPublicPosts();
 
     return posts;

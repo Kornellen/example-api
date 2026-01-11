@@ -1,4 +1,4 @@
-import { PublicPosts } from "../../repositories/types/post.types";
+import { PublicPost } from "../../repositories/types/post.types";
 
 export interface IPostService {
   createPost(
@@ -22,5 +22,5 @@ export interface IPostService {
 
   removePost(postId: number, userId: string): Promise<ReturnMessage>;
 
-  getPublicPost(): Promise<PublicPosts>;
+  getPublicPost(): Promise<PublicPost[] | null>;
 }

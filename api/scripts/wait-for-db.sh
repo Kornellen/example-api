@@ -11,10 +11,6 @@ done
 
 echo "DB is ready"
 
-# echo "Running prisma migration..."
-# npx prisma migrate dev --name init
-
-# npx prisma db seed
 
 echo "Staring API"
 exec npm run start:dev

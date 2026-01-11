@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "npm run build && node dist/index.js",
     "test": "jest",
-    "postinstall": "npx prisma generate"
+    "postinstall": "npx prisma generate && npx prisma db seed"
   },
   "keywords": [],
   "author": "Kornellen",

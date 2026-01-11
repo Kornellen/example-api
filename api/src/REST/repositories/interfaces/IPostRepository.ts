@@ -1,16 +1,18 @@
 import { Post, PostLike } from "@app/db/models";
-import { PublicPosts } from "../types/post.types";
+import { PostBasic, PostDetails, PublicPost } from "../types/post.types";
 
 export interface IPostRepository {
   findPostById(postId: number): Promise<Post | null>;
   findPostByAuthorAndId(postId: number, userId: string): Promise<Post | null>;
+
+  findUserPosts(userId: string): Promise<PostBasic[] | null>;
 
   findPostLikeByUserAndId(
     postId: number,
     userId: string
   ): Promise<PostLike | null>;
 
-  findPublicPosts(): Promise<PublicPosts>;
+  findPublicPosts(): Promise<PublicPost[] | null>;
 
   createPost(
     title: string,
@@ -32,5 +34,5 @@ export interface IPostRepository {
 
   dislikePost(likeId: number): Promise<ReturnMessage>;
 
-  loadPostData(postId: number, userId: string): any;
+  loadPostData(postId: number, userId: string): Promise<PostDetails | null>;
 }

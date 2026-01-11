@@ -3,6 +3,8 @@ import { HttpError } from "../helpers/HttpError";
 import { SecurityManager } from "@app/security";
 import { IUserRepository } from "@app/interfaces/repositories";
 import { User } from "@app/db/models";
+import { UserPrivate, UserPublic } from "../services/types/user.types";
+import { cacheData } from "src/utils/infrastructure/cacheData";
 export class UserRepository implements IUserRepository {
   constructor() {}
   public async findUserByEmail(email: string): Promise<User | null> {
@@ -52,17 +54,67 @@ export class UserRepository implements IUserRepository {
       },
     });
   }
-
   public async getUserData(
     userId: string,
-    additonalSettings: object
-  ): Promise<User | null> {
-    return await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      ...additonalSettings,
-    });
+    config: "PUBLIC"
+  ): Promise<UserPublic | null>;
+  public async getUserData(
+    userId: string,
+    config: "PRIVATE"
+  ): Promise<UserPrivate | null>;
+
+  public async getUserData<T>(
+    userId: string,
+    config: "PUBLIC" | "PRIVATE"
+  ): Promise<T | null> {
+    if (config === "PUBLIC") {
+      return (await cacheData(`public:user:${userId}`, () =>
+        prisma.user.findUnique({
+          where: {
+            id: userId,
+          },
+          select: {
+            id: true,
+            username: true,
+            role: true,
+            email: true,
+            _count: {
+              select: {
+                comments: true,
+              },
+            },
+          },
+        })
+      )) as T | null;
+    } else {
+      return (await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          id: true,
+          username: true,
+          role: true,
+          email: true,
+          first_name: true,
+          last_name: true,
+          city: true,
+          age: true,
+          password: true,
+          loginMethod: {
+            select: {
+              name: true,
+            },
+          },
+          _count: {
+            select: {
+              comments: true,
+              posts: true,
+            },
+          },
+        },
+      })) as T | null;
+    }
   }
 
   public async modifyUserData(

@@ -19,10 +19,11 @@ RUN mkdir -p /api/certificates && \
     -out   /api/certificates/cert.crt \
     -subj "/CN=localhost"
 
-    RUN chown -R app:appgroup /api
+    
+RUN chown -R app:appgroup /api
 
 USER app
-
+    
 EXPOSE 80 443 5050
 
 RUN chmod 776 /api/scripts/wait-for-db.sh

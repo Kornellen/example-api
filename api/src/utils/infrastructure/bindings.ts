@@ -16,7 +16,7 @@ import { GoogleStrategyService } from "src/REST/services/auth/strategies/GoogleS
 import { ClassicStrategyService } from "src/REST/services/auth/strategies/ClassicStrategyService";
 
 type RepoBinds = { token: string; fact: () => any }[];
-type ServiceBinds = { token: string; repoToken: string; service: any }[];
+type ServiceBinds = { token: string; deps: string[]; service: any }[];
 
 const reposBinds: RepoBinds = [
   {
@@ -32,24 +32,28 @@ reposBinds.forEach((repo) => container.bind(repo.token, repo.fact));
 const servicesBinds: ServiceBinds = [
   {
     token: "GoogleStrategyService",
-    repoToken: "IUserRepository",
+    deps: ["IUserRepository"],
     service: GoogleStrategyService,
   },
   {
     token: "ClassicStrategyService",
-    repoToken: "IUserRepository",
+    deps: ["IUserRepository"],
     service: ClassicStrategyService,
   },
   {
     token: "CommentService",
-    repoToken: "ICommentRepository",
+    deps: ["ICommentRepository"],
     service: CommentService,
   },
-  { token: "PostService", repoToken: "IPostRepository", service: PostService },
-  { token: "UserService", repoToken: "IUserRepository", service: UserService },
+  { token: "PostService", deps: ["IPostRepository"], service: PostService },
+  {
+    token: "UserService",
+    deps: ["IUserRepository", "IPostRepository"],
+    service: UserService,
+  },
   {
     token: "WishlistService",
-    repoToken: "IWishlistRepository",
+    deps: ["IWishlistRepository"],
     service: WishlistService,
   },
 ];
@@ -57,9 +61,10 @@ const servicesBinds: ServiceBinds = [
 servicesBinds.forEach((servc) =>
   container.bind(servc.token, (c) => {
     logger.info(`Initializing Service: ${servc.token}`);
-    const repo = c.get(servc.repoToken);
 
-    return new servc.service(repo);
+    const deps = servc.deps.map((dep) => c.get(dep));
+
+    return new servc.service(...deps);
   })
 );
 export default {};

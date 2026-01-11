@@ -26,5 +26,6 @@
       "@app/interfaces/services": ["src/REST/services/interfaces"],
       "@app/interfaces/repositories": ["src/REST/repositories/interfaces"]
     }
-  }
+  },
+  "exclude": ["node_modules", "dist"]
 }

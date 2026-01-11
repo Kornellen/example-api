@@ -1,4 +1,5 @@
 import { User } from "@app/db/models";
+import { UserPrivate, UserPublic } from "src/REST/services/types/user.types";
 
 export interface IUserRepository {
   findUserByEmail(email: string): Promise<User | null>;
@@ -14,7 +15,10 @@ export interface IUserRepository {
     hashedPassword?: string
   ): Promise<User>;
 
-  getUserData(userId: string, additonalSettings: object): Promise<User | null>;
+  getUserData<T extends User>(
+    userId: string,
+    config: "PUBLIC" | "PRIVATE"
+  ): Promise<T | null>;
 
   modifyUserData(dataToModify: object, userId: string): Promise<ReturnMessage>;
 

@@ -1,9 +1,10 @@
 import { prisma } from "@app/db";
 import { IPostRepository } from "@app/interfaces/repositories";
-import { PublicPosts } from "./types/post.types";
-import { Post, PostLike } from "@app/db/models";
+import { PostBasic, PostDetails, PublicPost } from "./types/post.types";
+import { Comment, Post, PostLike } from "@app/db/models";
 import { cacheData } from "src/utils/infrastructure/cacheData";
-import { CommentDTO, LikeDTO, PostDTO } from "types/dtos/";
+import { PostLikeId } from "./types/like.types";
+import { PostComment } from "./types/comment.types";
 
 export class PostRepository implements IPostRepository {
   constructor() {}
@@ -45,7 +46,45 @@ export class PostRepository implements IPostRepository {
     });
   }
 
-  public async findPublicPosts(): Promise<PublicPosts> {
+  public async findUserPosts(userId: string): Promise<PostBasic[] | null> {
+    const cacheKey = `posts:public:user:${userId}`;
+
+    return await cacheData(
+      cacheKey,
+      (): Promise<PostBasic[]> =>
+        Promise.resolve(
+          prisma.post.findMany({
+            where: {
+              authorId: userId,
+            },
+            select: {
+              id: true,
+              createdAt: true,
+              updatedAt: true,
+              title: true,
+              content: true,
+              published: true,
+              authorId: true,
+              author: {
+                select: {
+                  username: true,
+                  role: true,
+                },
+              },
+              _count: {
+                select: {
+                  comments: true,
+                  likes: true,
+                },
+              },
+            },
+          })
+        ),
+      60
+    );
+  }
+
+  public async findPublicPosts(): Promise<PublicPost[] | null> {
     return await prisma.post.findMany({
       select: {
         createdAt: true,
@@ -142,9 +181,13 @@ export class PostRepository implements IPostRepository {
     postId: number,
     userId: string
   ): Promise<{ message: string }> {
+    const post = await this.getPostBasic(postId, userId);
+
+    if (!post) return { message: "Post Not Found" };
+
     await prisma.postLike.create({
       data: {
-        postId: postId,
+        postId: post.id,
         userId: userId,
       },
     });
@@ -161,7 +204,10 @@ export class PostRepository implements IPostRepository {
 
     return { message: "Disliked" };
   }
-  private async getPostBasic(postId: number, userId: string) {
+  private async getPostBasic(
+    postId: number,
+    userId: string
+  ): Promise<PostBasic | null> {
     return prisma.post.findFirst({
       where: {
         id: postId,
@@ -190,41 +236,38 @@ export class PostRepository implements IPostRepository {
       },
     });
   }
-  private async getPostLikes(
-    postId: number
-  ): Promise<{ user: { username: string } }[]> {
+  private async getPostLikes(postId: number): Promise<PostLikeId[]> {
     return prisma.postLike.findMany({
       where: { postId },
-      select: {
-        user: {
-          select: {
-            username: true,
-          },
-        },
-      },
     });
   }
-  private async getPostComments(postId: number) {
-    return prisma.comment.findMany({
-      where: { postId },
-      select: {
-        id: true,
-        content: true,
-        createdAt: true,
-        author: {
-          select: { username: true },
+  private async getPostComments(postId: number): Promise<PostComment[]> {
+    const comments = await Promise.resolve(
+      prisma.comment.findMany({
+        where: { postId },
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          author: {
+            select: { username: true },
+          },
+          _count: {
+            select: { likes: true },
+          },
         },
-        _count: {
-          select: { likes: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+        orderBy: { createdAt: "desc" },
+      })
+    );
+
+    if (!comments) return [];
+
+    return comments;
   }
   public async loadPostData(
     postId: number,
     userId: string
-  ): Promise<PostDTO | null> {
+  ): Promise<PostDetails | null> {
     const postBasic = await this.getPostBasic(postId, userId);
 
     if (!postBasic) return null;
@@ -235,7 +278,7 @@ export class PostRepository implements IPostRepository {
 
     const result = await cacheData(
       cacheKey,
-      () =>
+      (): Promise<PostDetails> =>
         Promise.all([
           Promise.resolve(postBasic),
           this.getPostLikes(postId),
@@ -246,33 +289,6 @@ export class PostRepository implements IPostRepository {
 
     if (!result) return null;
 
-    const [post, likes, comments] = result;
-
-    const postDTO: PostDTO = {
-      id: post.id,
-      author: {
-        userId: post.authorId,
-        username: post.author.username,
-        role: post.author.role,
-      },
-      comments: comments.map(
-        (comment): CommentDTO => ({
-          content: comment.content,
-          createdAt: comment.createdAt,
-          likes: comment._count.likes,
-          username: comment.author.username,
-        })
-      ),
-      content: post.content,
-      createdAt: post.createdAt,
-      updatedAt: post.updatedAt,
-      likes: likes.map((like): LikeDTO => ({ username: like.user.username })),
-      title: post.title,
-      numOfComments: post._count.comments,
-      numOfLikes: post._count.likes,
-      published: post.published,
-    };
-
-    return postDTO;
+    return result;
   }
 }

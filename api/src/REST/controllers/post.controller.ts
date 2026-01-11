@@ -124,9 +124,14 @@ export class PostController {
     }
   }
 
-  public async likePost(req: any, res: Response, next: NextFunction) {
+  public async likePost(
+    req: any,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const { id } = req.params;
+      if (req.user === undefined) throw new HttpError("Unauthorized", 401);
       const { userId } = req.user;
 
       if (!id || isNaN(Number(id))) {

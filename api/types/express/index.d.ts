@@ -11,7 +11,7 @@ declare global {
       exp?: number;
     }
     interface Request {
-      user?: UserToken;
+      user?: UserToken | null;
     }
   }
 }
