@@ -1,46 +1,34 @@
 services:
   api:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
       - "80:5174"
       - "443:5175"
     env_file:
-      - .env
+      - ../.env
     environment:
-      DATABASE_URL: ${DATABASE_URL}
       PORT: 5174
-
-      JWT_SECRET: ${JWT_SECRET}
-
-      GOOGLE_AUTH_SECRET: ${GOOGLE_AUTH_SECRET}
-      GOOGLE_AUTH_ID: ${GOOGLE_AUTH_ID}
-
-      CALLBACK_URL: ${CALLBACK_URL}
-
-      GITHUB_AUTH_SECRET: ${GITHUB_AUTH_SECRET}
-      GITHUB_AUTH_ID: ${GITHUB_AUTH_ID}
-
-      REDIS_HOST: ${REDIS_HOST}
-
       REDIS_PORT: 6379
-
       NODE_ENV: development
     depends_on:
       - db
       - redis
     volumes:
-      - ./scripts:/api/scripts
-      - ./src:/api/src
+      - ../scripts:/api/scripts
+      - ../src:/api/src
   db:
     image: postgres:16
     ports:
       - "5050:5432"
+    env_file:
+      - ../.env
     environment:
       POSTGRES_DB: api
       POSTGRES_USER: app
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWD}
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data_dev:/var/lib/postgresql/data_dev
     stop_grace_period: 30s
   redis:
     image: redis:8
@@ -48,4 +36,4 @@ services:
       - "6379:6379"
     command: ["redis-server", "--appendonly", "yes"]
 volumes:
-  db_data:
+  db_data_dev:

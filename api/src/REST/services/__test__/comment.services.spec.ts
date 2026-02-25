@@ -35,14 +35,14 @@ describe("CommentService", () => {
       const result = await service.addComment(
         mockComment.authorId,
         mockComment.content,
-        mockComment.postId
+        mockComment.postId,
       );
       expect(result).toEqual(expectedMsg);
       expect(mockRepo.createComment).toHaveBeenCalledTimes(1);
       expect(mockRepo.createComment).toHaveBeenCalledWith(
         mockComment.authorId,
         mockComment.postId,
-        mockComment.content
+        mockComment.content,
       );
     });
   });
@@ -57,7 +57,7 @@ describe("CommentService", () => {
 
       const result = await service.removeComment(
         mockComment.id,
-        mockComment.authorId
+        mockComment.authorId,
       );
 
       expect(result).toEqual(expectedMsg);
@@ -69,7 +69,7 @@ describe("CommentService", () => {
       mockRepo.findCommentById.mockResolvedValue(null);
 
       await expect(
-        service.removeComment(mockComment.id, mockComment.authorId)
+        service.removeComment(mockComment.id, mockComment.authorId),
       ).rejects.toMatchObject({
         message: "Comment not found",
         statusCode: 404,
@@ -80,7 +80,7 @@ describe("CommentService", () => {
       mockRepo.findCommentById.mockResolvedValue(mockComment);
 
       await expect(
-        service.removeComment(mockComment.id, otherUserId)
+        service.removeComment(mockComment.id, otherUserId),
       ).rejects.toMatchObject({ message: "Unauthorized", statusCode: 401 });
     });
   });
@@ -104,7 +104,7 @@ describe("CommentService", () => {
       mockRepo.findCommentById.mockResolvedValue(null);
 
       await expect(
-        service.updateComment(mockComment.id, changes)
+        service.updateComment(mockComment.id, changes),
       ).rejects.toMatchObject({
         message: "Comment not found",
         statusCode: 404,
