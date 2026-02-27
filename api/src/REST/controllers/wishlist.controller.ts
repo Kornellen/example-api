@@ -14,7 +14,7 @@ export class WishlistController {
   public async getWishlistProducts(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> {
     try {
       if (!req.user || !isUserToken(req.user) || !req.user.userId) {
@@ -34,14 +34,14 @@ export class WishlistController {
   public async addProductToWishlist(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> {
     try {
       const { wishlistId, productId } = req.body;
 
       const response = await this.wishlistService.addProductToWishlist(
         wishlistId,
-        productId
+        productId,
       );
 
       res.send(response);
@@ -53,14 +53,13 @@ export class WishlistController {
   public async removeProductFromWishlist(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> {
     try {
       const { wishlistProductId } = req.body;
 
-      const response = await this.wishlistService.removeProductFromWishlist(
-        wishlistProductId
-      );
+      const response =
+        await this.wishlistService.removeProductFromWishlist(wishlistProductId);
 
       res.send(response);
     } catch (error) {

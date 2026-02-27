@@ -9,7 +9,7 @@ wishlistRouter.get(
   "/wishlist",
   verifyJWT,
   (req: any, res: any, next: NextFunction) =>
-    wishlistController.getWishlistProducts(req, res, next)
+    wishlistController.getWishlistProducts(req, res, next),
 );
 
 wishlistRouter.post("/wishlist", (req: any, res: any, next: NextFunction) => {

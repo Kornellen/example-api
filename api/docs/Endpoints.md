@@ -413,7 +413,7 @@ DELETE `/api/comment/1`
 
 ### GET `/api/wishlist`
 
-Get all wishlists for the current user.
+Get products from user's wishlist
 
 **Request:**  
 GET `/api/wishlist`
@@ -424,9 +424,8 @@ GET `/api/wishlist`
 [
   {
     "id": 1,
-    "name": "My Wishlist",
-    "userId": 1,
-    "posts": [1, 2]
+    "productId": "10",
+    "wishlistId": 1
   }
 ]
 ```
@@ -435,13 +434,14 @@ GET `/api/wishlist`
 
 ### POST `/api/wishlist`
 
-Create a new wishlist.
+Add product to wishlist
 
 **Request:**
 
 ```json
 {
-  "name": "My Wishlist"
+  "wishlistId": 1,
+  "productId": "1"
 }
 ```
 
@@ -449,84 +449,22 @@ Create a new wishlist.
 
 ```json
 {
-  "id": 1,
-  "name": "My Wishlist",
-  "userId": 1,
-  "posts": []
+  "message": "Product Added to wishlist"
 }
 ```
 
 ---
 
-### GET `/api/wishlist/:id`
+### DELETE `/api/wishlist`
 
-Get wishlist by ID.
-
-**Request:**  
-GET `/api/wishlist/1`
-
-**Response:**
-
-```json
-{
-  "id": 1,
-  "name": "My Wishlist",
-  "userId": 1,
-  "posts": [1, 2]
-}
-```
-
----
-
-### PUT `/api/wishlist/:id`
-
-Update wishlist by ID.
-
-**Request:**  
-PUT `/api/wishlist/1`
-
-```json
-{
-  "name": "Updated Wishlist Name"
-}
-```
-
-**Response:**
-
-```json
-{
-  "message": "Wishlist updated successfully"
-}
-```
-
----
-
-### DELETE `/api/wishlist/:id`
-
-Delete wishlist by ID.
-
-**Request:**  
-DELETE `/api/wishlist/1`
-
-**Response:**
-
-```json
-{
-  "message": "Wishlist deleted successfully"
-}
-```
-
----
-
-### POST `/api/wishlist/:id/add`
-
-Add a post to a wishlist.
+Remove product to wishlist
 
 **Request:**
 
 ```json
 {
-  "postId": 123
+  "wishlistId": 1,
+  "productId": "1"
 }
 ```
 
@@ -534,28 +472,6 @@ Add a post to a wishlist.
 
 ```json
 {
-  "message": "Post added to wishlist"
-}
-```
-
----
-
-### POST `/api/wishlist/:id/remove`
-
-Remove a post from a wishlist.
-
-**Request:**
-
-```json
-{
-  "postId": 123
-}
-```
-
-**Response:**
-
-```json
-{
-  "message": "Post removed from wishlist"
+  "message": "Successfull removed from wishlist"
 }
 ```
